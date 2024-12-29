@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class DashboardPanel extends JPanel {
@@ -101,7 +102,7 @@ public class DashboardPanel extends JPanel {
                     user.setAddress(address);
                     user.setBirthDate(birthDate != null && !birthDate.isEmpty() ? LocalDate.parse(birthDate) : null);
                     user.setPhotoPath(photoPath != null && !photoPath.isEmpty() ? photoPath : null);
-                    user.setCreatedAt(createdAt != null && !createdAt.isEmpty() ? LocalDate.parse(createdAt) : null);
+                    user.setCreatedAt(createdAt != null && !createdAt.isEmpty() ? LocalDateTime.parse(createdAt) : null);
 
                     userController.updateProfile(user);
                     loadUsers();

@@ -19,6 +19,10 @@ public class RegisterPanel extends JPanel {
     private JTextField birthDateField;
     private JButton registerButton;
     private JButton backButton;
+    private JTextField otpField; // Untuk input OTP
+    private JButton verifyOtpButton; // Tombol untuk verifikasi OTP
+    private String registeredEmail; // Tambahkan variabel untuk email yang didaftarkan
+
 
     public RegisterPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -39,6 +43,8 @@ public class RegisterPanel extends JPanel {
         birthDateField = new JTextField(20);
         registerButton = new JButton("Register");
         backButton = new JButton("Back to Login");
+        otpField = new JTextField(20); // Untuk input OTP
+        verifyOtpButton = new JButton("Verify OTP"); // Tombol untuk verifikasi OTP
 
         // Set preferred sizes
         Dimension fieldSize = new Dimension(250, 35);
@@ -47,10 +53,12 @@ public class RegisterPanel extends JPanel {
         passwordField.setPreferredSize(fieldSize);
         confirmPasswordField.setPreferredSize(fieldSize);
         birthDateField.setPreferredSize(fieldSize);
+        otpField.setPreferredSize(fieldSize); // Set size untuk OTP field
 
         Dimension buttonSize = new Dimension(250, 40);
         registerButton.setPreferredSize(buttonSize);
         backButton.setPreferredSize(buttonSize);
+        verifyOtpButton.setPreferredSize(buttonSize); // Set size untuk tombol OTP
     }
 
     private void setupLayout() {
@@ -89,6 +97,12 @@ public class RegisterPanel extends JPanel {
         formPanel.add(registerButton, formGbc);
         formPanel.add(Box.createVerticalStrut(10), formGbc);
         formPanel.add(backButton, formGbc);
+        formPanel.add(Box.createVerticalStrut(10), formGbc);
+
+        // OTP Input
+        formPanel.add(new JLabel("Enter OTP:"), formGbc);
+        formPanel.add(otpField, formGbc);
+        formPanel.add(verifyOtpButton, formGbc);
 
         // Add to main panel
         add(titlePanel, gbc);
@@ -107,6 +121,8 @@ public class RegisterPanel extends JPanel {
             clearFields();
             mainFrame.showLogin();
         });
+
+        verifyOtpButton.addActionListener(e -> verifyOtp());
     }
 
     private boolean validateInput() {
@@ -152,17 +168,20 @@ public class RegisterPanel extends JPanel {
             user.setPassword(new String(passwordField.getPassword()));
             user.setAddress(addressArea.getText());
             user.setBirthDate(LocalDate.parse(birthDateField.getText()));
-
+    
+            // Menyimpan email untuk verifikasi OTP nanti
+            registeredEmail = emailField.getText(); // Menyimpan email
+    
             userController.register(user);
-
+    
             JOptionPane.showMessageDialog(this,
-                    "Registration successful! Please login.",
+                    "Registration successful! Please check your email for OTP.",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
-
+    
             clearFields();
             mainFrame.showLogin();
-
+    
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
                     "Registration failed: " + ex.getMessage(),
@@ -170,6 +189,28 @@ public class RegisterPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE);
         }
     }
+    
+
+    private void verifyOtp() {
+        String otp = otpField.getText().trim();
+        if (otp.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter OTP", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    
+        try {
+            boolean verified = userController.verifyOtp(registeredEmail, otp); // Gunakan registeredEmail
+            if (verified) {
+                JOptionPane.showMessageDialog(this, "OTP verified successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                mainFrame.showLogin(); // Optionally navigate to login
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid or expired OTP", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error verifying OTP: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
 
     private void clearFields() {
         nameField.setText("");
@@ -178,5 +219,6 @@ public class RegisterPanel extends JPanel {
         confirmPasswordField.setText("");
         addressArea.setText("");
         birthDateField.setText("");
+        otpField.setText(""); // Clear OTP field
     }
 }
