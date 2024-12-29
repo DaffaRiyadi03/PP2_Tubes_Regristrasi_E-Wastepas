@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'tubes.ewaste'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Database
+    implementation 'mysql:mysql-connector-java:8.0.33'
+    implementation 'org.mybatis:mybatis:3.5.13'
+
+    // GUI Components
+    implementation 'com.formdev:flatlaf:3.2.1'
+
+    // Utilities
+    implementation 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    // Testing
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+application {
+    mainClass = 'tubes.ewaste.Main'
+}
+
+test {
+    useJUnitPlatform()
+}
