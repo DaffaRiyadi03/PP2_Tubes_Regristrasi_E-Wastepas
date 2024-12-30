@@ -122,8 +122,7 @@ public class RegisterPanel extends JPanel {
             return false;
         }
 
-        if (!new String(passwordField.getPassword())
-                .equals(new String(confirmPasswordField.getPassword()))) {
+        if (!new String(passwordField.getPassword()).equals(new String(confirmPasswordField.getPassword()))) {
             JOptionPane.showMessageDialog(this,
                     "Passwords do not match",
                     "Validation Error",
@@ -152,17 +151,15 @@ public class RegisterPanel extends JPanel {
             user.setPassword(new String(passwordField.getPassword()));
             user.setAddress(addressArea.getText());
             user.setBirthDate(LocalDate.parse(birthDateField.getText()));
-
+    
             userController.register(user);
-
-            JOptionPane.showMessageDialog(this,
-                    "Registration successful! Please login.",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-            clearFields();
-            mainFrame.showLogin();
-
+    
+            // Simpan email pengguna untuk digunakan di OTPPanel
+            mainFrame.setEmailForVerification(user.getEmail());
+    
+            // Redirect ke OTPPanel
+            mainFrame.showOTP();
+    
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
                     "Registration failed: " + ex.getMessage(),
@@ -170,6 +167,7 @@ public class RegisterPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE);
         }
     }
+    
 
     private void clearFields() {
         nameField.setText("");
