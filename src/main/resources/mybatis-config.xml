@@ -16,7 +16,6 @@
     </environments>
 
     <mappers>
-
-        <mapper class="tubes.ewaste.mapper.UserMapper"/>
+        <package name="tubes.ewaste.mapper" />
     </mappers>
 </configuration>

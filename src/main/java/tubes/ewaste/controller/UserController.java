@@ -2,25 +2,29 @@ package tubes.ewaste.controller;
 
 import java.util.List;
 import java.util.Random;
-import java.util.Properties;
+import java.time.LocalDateTime;
+
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import tubes.ewaste.config.DatabaseConfig;
+import tubes.ewaste.mapper.OtpMapper;
 import tubes.ewaste.mapper.UserMapper;
+import tubes.ewaste.model.Otp;
 import tubes.ewaste.model.User;
-import jakarta.mail.*;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-import java.time.LocalDateTime;
+import tubes.ewaste.service.MailService;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class UserController {
     private final SqlSessionFactory factory;
+    private final MailService mailService;
 
+    // Constructor
     public UserController() {
         this.factory = DatabaseConfig.getSqlSessionFactory();
+        this.mailService = new MailService(); // Initialize MailService
     }
 
+    // Login method
     public boolean login(String email, String password) {
         try (SqlSession session = factory.openSession()) {
             UserMapper mapper = session.getMapper(UserMapper.class);
@@ -28,33 +32,74 @@ public class UserController {
         }
     }
 
+    // Register method with OTP functionality
     public void register(User user) throws Exception {
         try (SqlSession session = factory.openSession()) {
-            UserMapper mapper = session.getMapper(UserMapper.class);
+            UserMapper userMapper = session.getMapper(UserMapper.class);
+            OtpMapper otpMapper = session.getMapper(OtpMapper.class);
     
-            // Hash the password before storing
+            // Hash password
             String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-            user.setPassword(hashedPassword); // Set hashed password
+            user.setPassword(hashedPassword);
+            user.setCreatedAt(LocalDateTime.now());
+    
+            // Insert user
+            userMapper.insert(user);
     
             // Generate OTP
-            String otp = generateOtp();
-            user.setOtp(otp);
-            user.setVerified(false);
-            user.setCreatedAt(LocalDateTime.now()); // Set created timestamp
-    
-            // Set OTP expiry (e.g., 10 minutes)
-            user.setOtpExpiry(LocalDateTime.now().plusMinutes(10));
-    
-            // Insert user into database
-            mapper.insert(user);
+// Generate and save OTP
+String otpCode = generateOtp();
+Otp otp = new Otp();
+otp.setEmail(user.getEmail());
+otp.setOtpCode(otpCode);
+otp.setExpiresAt(LocalDateTime.now().plusMinutes(60));  // Ensure this is set properly
+otp.setStatus("ACTIVE");
+otpMapper.insert(otp);
+
             session.commit();
     
-            // Send OTP to email
-            sendOtpEmail(user.getEmail(), otp);
+            // Send OTP via email
+            mailService.sendOtpEmail(user.getEmail(), otpCode);
         }
     }
     
+    private String generateOtp() {
+        Random random = new Random();
+        int otp = 100000 + random.nextInt(900000); // Generate 6 digit OTP
+        return String.valueOf(otp);
+    }
+    
 
+    public boolean verifyOtp(String email, String otpCode) {
+        try (SqlSession session = factory.openSession()) {
+            OtpMapper otpMapper = session.getMapper(OtpMapper.class);
+            UserMapper userMapper = session.getMapper(UserMapper.class);
+    
+            // Find active OTP
+            Otp otp = otpMapper.findActiveOtpByEmail(email);
+            if (otp == null || otp.getExpiresAt().isBefore(LocalDateTime.now())) {
+                return false; // OTP expired or not found
+            }
+    
+            if (otp.getOtpCode().equals(otpCode)) {
+                otpMapper.updateStatus(otp.getId(), "USED"); // Mark as used
+                session.commit();
+    
+                // Update user's is_verified to "YES"
+                userMapper.updateVerificationStatus(email, "YES");
+                session.commit();
+    
+                return true;
+            }
+    
+            return false; // Invalid OTP
+        }
+    }
+    
+    
+
+
+    // Method to find user by email
     public User findUserByEmail(String email) {
         try (SqlSession session = factory.openSession()) {
             UserMapper mapper = session.getMapper(UserMapper.class);
@@ -62,34 +107,7 @@ public class UserController {
         }
     }
 
-    public boolean verifyOtp(String email, String inputOtp) {
-        try (SqlSession session = factory.openSession()) {
-            UserMapper mapper = session.getMapper(UserMapper.class);
-    
-            // Retrieve user by email
-            User user = mapper.getByEmail(email);
-            if (user == null) {
-                return false;
-            }
-    
-            // Check if OTP has expired
-            if (user.getOtpExpiry().isBefore(LocalDateTime.now())) {
-                return false; // OTP expired
-            }
-    
-            // Verify OTP
-            if (user.getOtp().equals(inputOtp)) {
-                user.setVerified(true); // Update verification status
-                mapper.update(user);
-                session.commit();
-                return true;
-            }
-    
-            return false;
-        }
-    }
-    
-
+    // Method to update user profile
     public void updateProfile(User user) {
         try (SqlSession session = factory.openSession()) {
             UserMapper mapper = session.getMapper(UserMapper.class);
@@ -98,6 +116,7 @@ public class UserController {
         }
     }
 
+    // Method to get all users
     public List<User> getAllUsers() {
         try (SqlSession session = factory.openSession()) {
             UserMapper mapper = session.getMapper(UserMapper.class);
@@ -105,6 +124,7 @@ public class UserController {
         }
     }
 
+    // Method to delete user
     public void deleteUser(int userId) {
         try (SqlSession session = factory.openSession()) {
             UserMapper mapper = session.getMapper(UserMapper.class);
@@ -113,39 +133,4 @@ public class UserController {
         }
     }
 
-    private String generateOtp() {
-        Random random = new Random();
-        int otp = 100000 + random.nextInt(900000);
-        return String.valueOf(otp);
-    }
-
-    private void sendOtpEmail(String recipient, String otp) throws MessagingException {
-        String senderEmail = "retrogamea00@gmail.com"; // Ganti dengan email Anda
-        String senderPassword = "Nanamiko12!"; // Ganti dengan password email Anda
-
-        // Setup properties for email session
-        Properties properties = new Properties();
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls.enable", "true");
-        properties.put("mail.smtp.host", "smtp.gmail.com");
-        properties.put("mail.smtp.port", "587");
-
-        // Create email session
-        Session session = Session.getInstance(properties, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(senderEmail, senderPassword);
-            }
-        });
-
-        // Create email message
-        Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(senderEmail));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
-        message.setSubject("Your OTP for Registration");
-        message.setText("Your OTP is: " + otp);
-
-        // Send email
-        Transport.send(message);
-    }
 }

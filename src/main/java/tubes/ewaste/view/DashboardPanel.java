@@ -104,7 +104,6 @@ public class DashboardPanel extends JPanel {
                     user.setPhotoPath(photoPath != null && !photoPath.isEmpty() ? photoPath : null);
                     user.setCreatedAt(createdAt != null && !createdAt.isEmpty() ? LocalDateTime.parse(createdAt) : null);
 
-                    userController.updateProfile(user);
                     loadUsers();
                 } else {
                     JOptionPane.showMessageDialog(mainFrame, "Silahkan pilih item yang ingin di rubah!");
