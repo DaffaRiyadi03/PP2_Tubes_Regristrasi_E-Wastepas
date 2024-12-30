@@ -85,7 +85,7 @@ public class OTPPanel extends JPanel {
                             "OTP Verified Successfully!",
                             "Success",
                             JOptionPane.INFORMATION_MESSAGE);
-                    mainFrame.showLogin(); // Navigate to the dashboard
+                    mainFrame.showLogin();
                 } else {
                     JOptionPane.showMessageDialog(this,
                             "Invalid or Expired OTP",

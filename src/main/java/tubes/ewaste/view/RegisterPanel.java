@@ -154,6 +154,12 @@ public class RegisterPanel extends JPanel {
     
             userController.register(user);
     
+            // Tampilkan pesan sukses dan informasikan pengguna untuk cek email
+            JOptionPane.showMessageDialog(this,
+            "Registration successful! Please check your email to verify your account.",
+            "Registration Success",
+            JOptionPane.INFORMATION_MESSAGE);
+            
             // Simpan email pengguna untuk digunakan di OTPPanel
             mainFrame.setEmailForVerification(user.getEmail());
     

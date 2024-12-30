@@ -46,15 +46,14 @@ public class UserController {
             // Insert user
             userMapper.insert(user);
     
-            // Generate OTP
-// Generate and save OTP
-String otpCode = generateOtp();
-Otp otp = new Otp();
-otp.setEmail(user.getEmail());
-otp.setOtpCode(otpCode);
-otp.setExpiresAt(LocalDateTime.now().plusMinutes(60));  // Ensure this is set properly
-otp.setStatus("ACTIVE");
-otpMapper.insert(otp);
+            // Generate and save OTP
+            String otpCode = generateOtp();
+            Otp otp = new Otp();
+            otp.setEmail(user.getEmail());
+            otp.setOtpCode(otpCode);
+            otp.setExpiresAt(LocalDateTime.now().plusMinutes(60)); 
+            otp.setStatus("ACTIVE");
+            otpMapper.insert(otp);
 
             session.commit();
     
@@ -78,11 +77,11 @@ otpMapper.insert(otp);
             // Find active OTP
             Otp otp = otpMapper.findActiveOtpByEmail(email);
             if (otp == null || otp.getExpiresAt().isBefore(LocalDateTime.now())) {
-                return false; // OTP expired or not found
+                return false; 
             }
     
             if (otp.getOtpCode().equals(otpCode)) {
-                otpMapper.updateStatus(otp.getId(), "USED"); // Mark as used
+                otpMapper.updateStatus(otp.getId(), "USED");
                 session.commit();
     
                 // Update user's is_verified to "YES"
@@ -92,7 +91,7 @@ otpMapper.insert(otp);
                 return true;
             }
     
-            return false; // Invalid OTP
+            return false;
         }
     }
     

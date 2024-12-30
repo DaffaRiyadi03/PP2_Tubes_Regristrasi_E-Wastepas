@@ -8,8 +8,8 @@ public class MailService {
 
     // Kirim OTP ke email
     public void sendOtpEmail(String recipient, String otp) throws MessagingException {
-        String senderEmail = "retrogamea00@gmail.com"; // Ganti dengan email Anda
-        String senderPassword = "aenc uihf hbka ycfl"; // Ganti dengan password email Anda
+        String senderEmail = "retrogamea00@gmail.com"; 
+        String senderPassword = "aenc uihf hbka ycfl"; 
 
         // Setup properties untuk session email
         Properties properties = new Properties();
