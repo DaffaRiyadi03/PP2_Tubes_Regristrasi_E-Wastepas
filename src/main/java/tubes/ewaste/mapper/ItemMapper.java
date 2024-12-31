@@ -12,6 +12,19 @@ public interface ItemMapper {
     @Select("SELECT * FROM items")
     List<Item> getAll();
 
+    @Select("SELECT i.*, it.id AS itemTypeId, it.name AS itemTypeName, it.description AS itemTypeDescription " +
+        "FROM items i " +
+        "LEFT JOIN item_types it ON i.item_type_id = it.id")
+    @Results({
+        @Result(property = "id", column = "id"),
+        @Result(property = "name", column = "name"),
+        @Result(property = "description", column = "description"),
+        @Result(property = "itemType.id", column = "itemTypeId"),
+        @Result(property = "itemType.name", column = "itemTypeName"),
+        @Result(property = "itemType.description", column = "itemTypeDescription")
+    })
+    List<Item> getAllWithItemType();
+
     @Select("SELECT * FROM items WHERE item_type_id = #{itemTypeId}")
     List<Item> getByType(int itemTypeId);
 

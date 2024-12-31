@@ -44,7 +44,11 @@ public class Item {
         return itemType;
     }
 
-    public void setCategory(ItemType itemType) {
+    public void setItemType(ItemType itemType) {
         this.itemType = itemType;
+    }
+    @Override
+    public String toString() {
+        return name; 
     }
 }
