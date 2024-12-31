@@ -13,6 +13,11 @@ public interface UserMapper {
     User getById(Integer id);
 
     @Select("SELECT * FROM users WHERE email = #{email}")
+    @Results({
+        @Result(property = "email", column = "email"),
+        @Result(property = "password", column = "password"),
+        @Result(property = "roleId", column = "role_id"),
+    })
     User getByEmail(String email);
 
     @Insert("INSERT INTO users(name, email, password, address, birth_date, created_at, role_id) " +

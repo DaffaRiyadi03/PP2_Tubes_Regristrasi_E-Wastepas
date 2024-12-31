@@ -16,7 +16,7 @@ public class User {
     private LocalDateTime otpExpiry;
     private Boolean isUsed;
     private Boolean verified;
-    private String photoPath;  // Menambahkan photoPath kembali
+    private String photoPath;
 
     // Getter dan Setter untuk semua field
     public Integer getId() {
