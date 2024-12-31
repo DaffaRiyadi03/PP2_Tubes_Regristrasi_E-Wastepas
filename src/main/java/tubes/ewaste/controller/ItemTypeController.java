@@ -15,15 +15,23 @@ public class ItemTypeController {
         this.factory = DatabaseConfig.getSqlSessionFactory();
     }
 
-    // Get item types based on categoryId
-    public List<ItemType> getItemTypesByCategory(int categoryId) {
+    // Mendapatkan semua item types, termasuk kategori yang berelasi
+    public List<ItemType> getAllItemTypes() {
         try (SqlSession session = factory.openSession()) {
             ItemTypeMapper mapper = session.getMapper(ItemTypeMapper.class);
-            return mapper.getByCategoryId(categoryId);
+            return mapper.getAll(); // Ambil semua item type
         }
     }
 
-    // Add a new item type
+    // Mendapatkan item types berdasarkan kategori ID
+    public List<ItemType> getItemTypesByCategory(int categoryId) {
+        try (SqlSession session = factory.openSession()) {
+            ItemTypeMapper mapper = session.getMapper(ItemTypeMapper.class);
+            return mapper.getByCategoryId(categoryId); // Ambil item type berdasarkan kategori
+        }
+    }
+
+    // Menambahkan item type baru
     public void addItemType(ItemType itemType) {
         try (SqlSession session = factory.openSession()) {
             ItemTypeMapper mapper = session.getMapper(ItemTypeMapper.class);
@@ -32,7 +40,7 @@ public class ItemTypeController {
         }
     }
 
-    // Update an existing item type
+    // Memperbarui item type yang sudah ada
     public void updateItemType(ItemType itemType) {
         try (SqlSession session = factory.openSession()) {
             ItemTypeMapper mapper = session.getMapper(ItemTypeMapper.class);
@@ -41,11 +49,11 @@ public class ItemTypeController {
         }
     }
 
-    // Delete an item type by ID
-    public void deleteItemType(int typeId) {
+    // Menghapus item type berdasarkan ID
+    public void deleteItemType(int itemTypeId) {
         try (SqlSession session = factory.openSession()) {
             ItemTypeMapper mapper = session.getMapper(ItemTypeMapper.class);
-            mapper.delete(typeId);
+            mapper.delete(itemTypeId);
             session.commit();
         }
     }

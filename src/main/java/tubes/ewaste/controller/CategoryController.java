@@ -22,6 +22,13 @@ public class CategoryController {
         }
     }
 
+    public Category getCategoryById(int id) {
+        try (SqlSession session = factory.openSession()) {
+            CategoryMapper mapper = session.getMapper(CategoryMapper.class);
+            return mapper.getCategoryById(id); // Call the mapper method
+        }
+    }
+    
     public void addCategory(Category category) {
         try (SqlSession session = factory.openSession()) {
             CategoryMapper mapper = session.getMapper(CategoryMapper.class);
@@ -45,4 +52,5 @@ public class CategoryController {
             session.commit();
         }
     }
+
 }
