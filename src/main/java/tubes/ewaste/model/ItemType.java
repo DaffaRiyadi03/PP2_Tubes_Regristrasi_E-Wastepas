@@ -47,4 +47,8 @@ public class ItemType {
     public void setCategory(Category category) {
         this.category = category;
     }
+    @Override
+    public String toString() {
+        return name; // This will display the category name in the ComboBox
+    }
 }

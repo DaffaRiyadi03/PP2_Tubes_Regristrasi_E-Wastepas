@@ -18,6 +18,16 @@ public interface ItemTypeMapper {
     })
     List<ItemType> getAll();
 
+    @Select("SELECT * FROM item_types WHERE id = #{Id}")
+    @Results({
+        @Result(property = "category", column = "category_id", 
+                one = @One(select = "tubes.ewaste.mapper.CategoryMapper.getCategoryById")),
+        @Result(property = "id", column = "id"),
+        @Result(property = "name", column = "name"),
+        @Result(property = "description", column = "description"),
+    })
+    ItemType getById(@Param("id") int id);
+
     @Select("SELECT * FROM item_types WHERE category_id = #{categoryId}")
     List<ItemType> getByCategoryId(int categoryId);
 

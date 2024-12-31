@@ -15,10 +15,17 @@ public class ItemController {
         this.factory = DatabaseConfig.getSqlSessionFactory();
     }
 
-    public List<Item> getItemsByType(int typeId) {
+    public List<Item> getAllItems() {
         try (SqlSession session = factory.openSession()) {
             ItemMapper mapper = session.getMapper(ItemMapper.class);
-            return mapper.getByTypeId(typeId);
+            return mapper.getAll();
+        }
+    }
+
+    public List<Item> getItemsByType(int itemTypeId) {
+        try (SqlSession session = factory.openSession()) {
+            ItemMapper mapper = session.getMapper(ItemMapper.class);
+            return mapper.getByType(itemTypeId);
         }
     }
 
@@ -38,12 +45,11 @@ public class ItemController {
         }
     }
 
-    public void deleteItem(int itemId) {
+    public void deleteItem(int id) {
         try (SqlSession session = factory.openSession()) {
             ItemMapper mapper = session.getMapper(ItemMapper.class);
-            mapper.delete(itemId);
+            mapper.delete(id);
             session.commit();
         }
     }
-    
 }

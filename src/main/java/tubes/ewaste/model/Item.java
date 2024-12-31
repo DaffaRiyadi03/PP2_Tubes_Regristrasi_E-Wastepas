@@ -4,10 +4,8 @@ public class Item {
     private int id;
     private String name;
     private String description;
-    private double price;
-    private int stock;
-    private int typeId; // Foreign key to ItemType
-    private String categoryName; // Relasi dengan kategori
+    private int itemTypeId;  
+    private ItemType itemType; 
 
     // Getters and Setters
     public int getId() {
@@ -34,35 +32,19 @@ public class Item {
         this.description = description;
     }
 
-    public double getPrice() {
-        return price;
+    public int getItemTypeId() {
+        return itemTypeId;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setItemTypeId(int itemTypeId) {
+        this.itemTypeId = itemTypeId;
     }
 
-    public int getStock() {
-        return stock;
+    public ItemType getItemType() {
+        return itemType;
     }
 
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
-    public int getTypeId() {
-        return typeId;
-    }
-
-    public void setTypeId(int typeId) {
-        this.typeId = typeId;
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setCategory(ItemType itemType) {
+        this.itemType = itemType;
     }
 }
