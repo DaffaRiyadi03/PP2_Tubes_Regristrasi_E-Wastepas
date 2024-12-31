@@ -7,7 +7,20 @@ import java.util.List;
 
 public interface CategoryMapper {
     @Select("SELECT * FROM categories")
+    @Results({
+        @Result(property = "id", column = "id"),
+        @Result(property = "name", column = "name"),
+        @Result(property = "description", column = "description"),
+    })
     List<Category> getAll();
+
+    @Select("SELECT * FROM categories WHERE id = #{id}")
+    @Results({
+        @Result(property = "id", column = "id"),
+        @Result(property = "name", column = "name"),
+        @Result(property = "description", column = "description"),
+    })
+    Category getCategoryById(int id);
 
     @Insert("INSERT INTO categories(name, description) VALUES(#{name}, #{description})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
