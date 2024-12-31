@@ -6,6 +6,7 @@ import tubes.ewaste.config.DatabaseConfig;
 import tubes.ewaste.mapper.ItemMapper;
 import tubes.ewaste.model.Item;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemController {
@@ -15,12 +16,16 @@ public class ItemController {
         this.factory = DatabaseConfig.getSqlSessionFactory();
     }
 
-    public List<Item> getAllItems() {
-        try (SqlSession session = factory.openSession()) {
-            ItemMapper mapper = session.getMapper(ItemMapper.class);
-            return mapper.getAll();
-        }
+public List<Item> getAllItems() {
+    try (SqlSession session = factory.openSession()) {
+        ItemMapper mapper = session.getMapper(ItemMapper.class);
+        return mapper.getAllWithItemType(); // Panggil metode getAllWithItemType untuk mengambil data dengan ItemType
+    } catch (Exception e) {
+        e.printStackTrace(); // Log error
+        return new ArrayList<>(); // Return list kosong jika terjadi error
     }
+}
+
 
     public List<Item> getItemsByType(int itemTypeId) {
         try (SqlSession session = factory.openSession()) {
