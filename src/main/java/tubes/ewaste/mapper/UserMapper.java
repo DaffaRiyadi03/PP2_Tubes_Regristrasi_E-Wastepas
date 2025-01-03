@@ -26,7 +26,7 @@ public interface UserMapper {
     void insert(User user);
 
     @Update("UPDATE users SET name=#{name}, email=#{email}, " +
-            "address=#{address}, birth_date=#{birthDate}, created_at=#{createdAt}, role_id=#{roleId} WHERE id=#{id}")
+            "address=#{address}, birth_date=#{birthDate}, photo_path=#{photoPath}, created_at=#{createdAt}, role_id=#{roleId} WHERE id=#{id}")
     void update(User user);
 
     @Delete("DELETE FROM users WHERE id = #{id}")

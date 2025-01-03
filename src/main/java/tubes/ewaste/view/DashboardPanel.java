@@ -57,6 +57,14 @@ public class DashboardPanel extends JPanel {
     private JButton deleteItemsButton;
     private JButton updateItemsButton;
 
+    // Components for Update Profile Tab
+    private JTextField nameField;
+    private JTextField emailField;
+    private JTextField birthDateField;
+    private JTextField addressField;
+    private JTextField photoPathField;
+    private JButton saveProfileButton;
+    
     // Logout Button
     private JButton logoutButton;
 
@@ -106,7 +114,14 @@ public class DashboardPanel extends JPanel {
         updateItemsButton = new JButton("Rubah Item");
         deleteItemsButton = new JButton("Hapus Item");
 
-
+       // Update Profile Tab Components
+        nameField = new JTextField(20);
+        emailField = new JTextField(20);
+        birthDateField = new JTextField(20);
+        addressField = new JTextField(20);
+        photoPathField = new JTextField(20);
+        saveProfileButton = new JButton("Simpan Perubahan");
+        
         // Logout Button
         logoutButton = new JButton("Logout");
     }
@@ -138,6 +153,53 @@ public class DashboardPanel extends JPanel {
         itemPanel.add(createButtonPanel(refreshItemsButton, addItemsButton, updateItemsButton, deleteItemsButton), BorderLayout.SOUTH);
         tabbedPane.addTab("Kelola Item", itemPanel);
 
+        // Update Profile Tab Layout
+        JPanel updateProfilePanel = new JPanel();
+        updateProfilePanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        updateProfilePanel.add(new JLabel("Nama:"), gbc);
+
+        gbc.gridx = 1;
+        updateProfilePanel.add(nameField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        updateProfilePanel.add(new JLabel("Email:"), gbc);
+
+        gbc.gridx = 1;
+        updateProfilePanel.add(emailField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        updateProfilePanel.add(new JLabel("Tanggal Lahir (YYYY-MM-DD):"), gbc);
+
+        gbc.gridx = 1;
+        updateProfilePanel.add(birthDateField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        updateProfilePanel.add(new JLabel("Alamat:"), gbc);
+
+        gbc.gridx = 1;
+        updateProfilePanel.add(addressField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        updateProfilePanel.add(new JLabel("Path Foto:"), gbc);
+
+        gbc.gridx = 1;
+        updateProfilePanel.add(photoPathField, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 5;
+        updateProfilePanel.add(saveProfileButton, gbc);
+
+        tabbedPane.addTab("Update Profile", updateProfilePanel);
+        
         // Add TabbedPane and Logout Button
         add(tabbedPane, BorderLayout.CENTER);
         add(logoutButton, BorderLayout.SOUTH);
@@ -441,11 +503,44 @@ public class DashboardPanel extends JPanel {
             }
         });
 
-        
-        
+        // Update Profiler Listener
+        saveProfileButton.addActionListener(e -> updateProfile());
 
         // Logout Listener
         logoutButton.addActionListener(e -> mainFrame.showLogin());
+    }
+    
+    private void updateProfile() {
+        String name = nameField.getText();
+        String email = emailField.getText();
+        String birthDate = birthDateField.getText();
+        String address = addressField.getText();
+        String photoPath = photoPathField.getText();
+
+        if (name.isEmpty() || email.isEmpty() || birthDate.isEmpty() || address.isEmpty() || photoPath.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Semua field harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            LocalDate parsedBirthDate = LocalDate.parse(birthDate);
+
+            User currentUser = userController.getCurrentUser();
+            if (currentUser != null) {
+                currentUser.setName(name);
+                currentUser.setEmail(email);
+                currentUser.setBirthDate(parsedBirthDate);
+                currentUser.setAddress(address);
+                currentUser.setPhotoPath(photoPath);
+
+                userController.updateProfile(currentUser);
+                JOptionPane.showMessageDialog(this, "Profil berhasil diperbarui!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Gagal memuat data pengguna.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Tanggal lahir tidak valid (format: YYYY-MM-DD).", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public void loadUsers() {

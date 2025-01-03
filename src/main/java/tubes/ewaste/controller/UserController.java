@@ -18,6 +18,8 @@ public class UserController {
     private final SqlSessionFactory factory;
     private final MailService mailService;
 
+    private static User currentUser;
+    
     // Constructor
     public UserController() {
         this.factory = DatabaseConfig.getSqlSessionFactory();
@@ -25,11 +27,24 @@ public class UserController {
     }
 
     // Login method
+//    public boolean login(String email, String password) {
+//        try (SqlSession session = factory.openSession()) {
+//            UserMapper mapper = session.getMapper(UserMapper.class);
+//            return mapper.validateLogin(email, password) > 0;
+//        }
+//    }
+    
     public boolean login(String email, String password) {
         try (SqlSession session = factory.openSession()) {
             UserMapper mapper = session.getMapper(UserMapper.class);
-            return mapper.validateLogin(email, password) > 0;
+            User user = mapper.getByEmail(email);
+
+            if (mapper.validateLogin(email, password) > 0) {
+                setCurrentUser(user); // Set pengguna aktif
+                return true;
+            }
         }
+        return false;
     }
 
     // Register method with OTP functionality
@@ -132,4 +147,11 @@ public class UserController {
         }
     }
 
+    public static User getCurrentUser() {
+        return currentUser;
+    }
+
+    public static void setCurrentUser(User user) {
+        currentUser = user;
+    }
 }
